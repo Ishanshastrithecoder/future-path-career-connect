@@ -7,9 +7,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, Users, UserPlus, MessageCircle, Bell, Briefcase, BookOpen, MapPin, ThumbsUp, MessageSquare, Share2 } from 'lucide-react';
+import { Search, Users, UserPlus, MessageCircle, Bell, Briefcase, BookOpen, MapPin, ThumbsUp, MessageSquare, Share2, GraduationCap, Building } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { Link } from 'react-router-dom';
 
 // Mock data for connections
 const connections = [
@@ -19,6 +20,8 @@ const connections = [
     title: "Product Manager",
     company: "TechGrowth Inc.",
     industry: "Technology",
+    location: "San Francisco, CA",
+    education: "MBA, Stanford University",
     mutualConnections: 12,
     profilePicture: "https://randomuser.me/api/portraits/women/32.jpg"
   },
@@ -28,6 +31,8 @@ const connections = [
     title: "Software Engineer",
     company: "CodeWorks",
     industry: "Technology",
+    location: "Seattle, WA",
+    education: "BS Computer Science, University of Washington",
     mutualConnections: 8,
     profilePicture: "https://randomuser.me/api/portraits/men/72.jpg"
   },
@@ -37,6 +42,8 @@ const connections = [
     title: "Marketing Director",
     company: "Brand Elevate",
     industry: "Marketing",
+    location: "Chicago, IL",
+    education: "BA Marketing, Northwestern University",
     mutualConnections: 5,
     profilePicture: "https://randomuser.me/api/portraits/women/44.jpg"
   }
@@ -50,6 +57,8 @@ const suggestedConnections = [
     title: "Finance Analyst",
     company: "Global Financial",
     industry: "Finance",
+    location: "New York, NY",
+    education: "MS Finance, NYU",
     mutualConnections: 3,
     profilePicture: "https://randomuser.me/api/portraits/men/55.jpg"
   },
@@ -59,6 +68,8 @@ const suggestedConnections = [
     title: "UX Designer",
     company: "Creative Solutions",
     industry: "Design",
+    location: "Austin, TX",
+    education: "BFA Design, RISD",
     mutualConnections: 2,
     profilePicture: "https://randomuser.me/api/portraits/women/68.jpg"
   },
@@ -68,6 +79,8 @@ const suggestedConnections = [
     title: "Healthcare Administrator",
     company: "MedLife Systems",
     industry: "Healthcare",
+    location: "Boston, MA",
+    education: "MHA, Boston University",
     mutualConnections: 1,
     profilePicture: "https://randomuser.me/api/portraits/men/22.jpg"
   }
@@ -88,7 +101,8 @@ const initialPosts = [
     likes: 42,
     comments: 8,
     liked: false,
-    image: null
+    image: null,
+    tags: ["Career Development", "Tech Industry"]
   },
   {
     id: 2,
@@ -103,7 +117,8 @@ const initialPosts = [
     likes: 87,
     comments: 12,
     liked: false,
-    image: null
+    image: null,
+    tags: ["Project Management", "Professional Development"]
   },
   {
     id: 3,
@@ -118,7 +133,33 @@ const initialPosts = [
     likes: 124,
     comments: 32,
     liked: true,
-    image: null
+    image: null,
+    tags: ["Job Opportunity", "Remote Work", "Software Engineering"]
+  }
+];
+
+// Mock career insights data
+const careerInsights = [
+  {
+    id: 1,
+    title: "Software Engineering Career Growth",
+    description: "Explore the latest trends in software engineering career paths, compensation, and skill demands.",
+    type: "Industry Report",
+    image: "https://randomuser.me/api/portraits/lego/2.jpg"
+  },
+  {
+    id: 2,
+    title: "Data Science vs. Machine Learning Engineer",
+    description: "A comprehensive comparison of these two high-demand career paths and how to position yourself for success.",
+    type: "Career Comparison",
+    image: "https://randomuser.me/api/portraits/lego/3.jpg"
+  },
+  {
+    id: 3,
+    title: "The Future of Remote Work",
+    description: "How companies and professionals are adapting to remote and hybrid work models in 2025 and beyond.",
+    type: "Workplace Trends",
+    image: "https://randomuser.me/api/portraits/lego/4.jpg"
   }
 ];
 
@@ -129,6 +170,8 @@ const Network = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const [postTags, setPostTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
 
   const handleCreatePost = () => {
     if (!postContent.trim()) return;
@@ -146,11 +189,13 @@ const Network = () => {
       likes: 0,
       comments: 0,
       liked: false,
-      image: null
+      image: null,
+      tags: postTags
     };
     
     setPosts([newPost, ...posts]);
     setPostContent("");
+    setPostTags([]);
     
     toast({
       title: "Post created!",
@@ -176,6 +221,17 @@ const Network = () => {
       title: "Connection request sent!",
       description: "They'll be notified of your request."
     });
+  };
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !postTags.includes(tagInput.trim())) {
+      setPostTags([...postTags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setPostTags(postTags.filter(tag => tag !== tagToRemove));
   };
 
   const filteredConnections = connections.filter(conn => 
@@ -231,7 +287,7 @@ const Network = () => {
                   </div>
                 </div>
                 
-                <Button variant="outline" className="w-full mt-4">
+                <Button variant="outline" size="responsive" className="w-full mt-4">
                   View Profile
                 </Button>
               </div>
@@ -265,6 +321,13 @@ const Network = () => {
                   </div>
                   <Badge>5</Badge>
                 </div>
+                
+                <Link to="/career-insights" className="block mt-6">
+                  <Button size="responsive" variant="career" className="w-full">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Explore Career Insights
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -272,10 +335,11 @@ const Network = () => {
           {/* Main content area */}
           <div className="lg:col-span-3">
             <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid grid-cols-3 w-full">
+              <TabsList className="grid grid-cols-4 w-full">
                 <TabsTrigger value="feed">Feed</TabsTrigger>
                 <TabsTrigger value="connections">Connections</TabsTrigger>
                 <TabsTrigger value="discover">Discover</TabsTrigger>
+                <TabsTrigger value="insights">Insights</TabsTrigger>
               </TabsList>
               
               {/* Feed tab */}
@@ -298,11 +362,48 @@ const Network = () => {
                           className="resize-none mb-3"
                           rows={3}
                         />
-                        <div className="flex justify-end">
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {postTags.map((tag) => (
+                            <Badge key={tag} className="px-2 py-1">
+                              {tag}
+                              <button 
+                                className="ml-2 text-xs"
+                                onClick={() => handleRemoveTag(tag)}
+                              >
+                                ×
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                          <div className="flex-1 flex gap-2">
+                            <Input
+                              placeholder="Add a topic tag..."
+                              value={tagInput}
+                              onChange={(e) => setTagInput(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleAddTag();
+                                }
+                              }}
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={handleAddTag}
+                              size="sm"
+                            >
+                              Add
+                            </Button>
+                          </div>
                           <Button 
                             onClick={handleCreatePost}
                             disabled={!postContent.trim()}
                             className="bg-careerblue-600 hover:bg-careerblue-700"
+                            size="responsive"
                           >
                             Post
                           </Button>
@@ -337,6 +438,17 @@ const Network = () => {
 
                       <div className="mt-3">
                         <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
+                        
+                        {post.tags && post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {post.tags.map((tag, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
                         {post.image && (
                           <img 
                             src={post.image} 
@@ -398,15 +510,25 @@ const Network = () => {
                               <div>
                                 <h4 className="font-medium">{connection.name}</h4>
                                 <p className="text-sm text-gray-600">{connection.title} at {connection.company}</p>
+                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-xs text-gray-500 mt-1">
+                                  <div className="flex items-center">
+                                    <MapPin className="h-3 w-3 mr-1" />
+                                    <span>{connection.location}</span>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <GraduationCap className="h-3 w-3 mr-1" />
+                                    <span>{connection.education}</span>
+                                  </div>
+                                </div>
                                 <div className="flex items-center text-xs text-gray-500 mt-1">
                                   <Users className="h-3 w-3 mr-1" />
                                   <span>{connection.mutualConnections} mutual connections</span>
                                 </div>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="responsive">
                               <MessageCircle className="h-4 w-4 mr-1" />
-                              Message
+                              <span className="hidden sm:inline">Message</span>
                             </Button>
                           </div>
                         ))
@@ -447,16 +569,26 @@ const Network = () => {
                                 <div className="flex-1">
                                   <h4 className="font-medium">{connection.name}</h4>
                                   <p className="text-sm text-gray-600">{connection.title} at {connection.company}</p>
-                                  <div className="flex items-center text-xs text-gray-500 mt-1">
-                                    <Users className="h-3 w-3 mr-1" />
-                                    <span>{connection.mutualConnections} mutual connections</span>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1">
+                                    <div className="flex items-center">
+                                      <Building className="h-3 w-3 mr-1" />
+                                      <span>{connection.industry}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <MapPin className="h-3 w-3 mr-1" />
+                                      <span>{connection.location}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <Users className="h-3 w-3 mr-1" />
+                                      <span>{connection.mutualConnections} mutual</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="mt-4">
                                 <Button 
                                   className="w-full bg-careerblue-600 hover:bg-careerblue-700"
-                                  size="sm"
+                                  size="responsive"
                                   onClick={() => handleConnect(connection.id)}
                                 >
                                   <UserPlus className="h-4 w-4 mr-1" />
@@ -469,6 +601,42 @@ const Network = () => {
                       ) : (
                         <p className="text-gray-500 text-center py-4 col-span-2">No suggestions match your search</p>
                       )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              {/* Career Insights tab */}
+              <TabsContent value="insights" className="space-y-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-semibold mb-4">Career Insights & Resources</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      {careerInsights.map((insight) => (
+                        <Card key={insight.id} className="overflow-hidden">
+                          <div className="h-40 bg-gray-100">
+                            <img 
+                              src={insight.image}
+                              alt={insight.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <CardContent className="p-4">
+                            <Badge className="mb-2">{insight.type}</Badge>
+                            <h4 className="font-medium mb-2">{insight.title}</h4>
+                            <p className="text-sm text-gray-600">{insight.description}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <Link to="/career-insights">
+                        <Button size="lg" variant="career">
+                          Explore All Career Insights
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

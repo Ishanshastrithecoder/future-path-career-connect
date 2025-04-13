@@ -17,7 +17,7 @@ import NotFound from "./pages/NotFound";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import Mentors from "./pages/Mentors";
 import Network from "./pages/Network";
-import { Avatar } from "@/components/ui/avatar";
+import CareerInsights from "./pages/CareerInsights";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +49,7 @@ const App = () => (
             <Route path="/resume-builder" element={<ResumeBuilder />} />
             <Route path="/mentors" element={<Mentors />} />
             <Route path="/network" element={<Network />} />
+            <Route path="/career-insights" element={<CareerInsights />} />
 
             {/* Placeholder routes for future implementation */}
             <Route path="/career-explorer" element={<ComingSoon title="Career Explorer" />} />
