@@ -14,6 +14,10 @@ import Dashboard from "./pages/Dashboard";
 import Chatbot from "./pages/Chatbot";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import ResumeBuilder from "./pages/ResumeBuilder";
+import Mentors from "./pages/Mentors";
+import Network from "./pages/Network";
+import { Avatar } from "@/components/ui/avatar";
 
 const queryClient = new QueryClient();
 
@@ -42,14 +46,14 @@ const App = () => (
             } />
             
             <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/resume-builder" element={<ResumeBuilder />} />
+            <Route path="/mentors" element={<Mentors />} />
+            <Route path="/network" element={<Network />} />
 
             {/* Placeholder routes for future implementation */}
             <Route path="/career-explorer" element={<ComingSoon title="Career Explorer" />} />
-            <Route path="/resume-builder" element={<ComingSoon title="Resume Builder" />} />
             <Route path="/skill-assessment" element={<ComingSoon title="Skill Assessment" />} />
             <Route path="/interviews" element={<ComingSoon title="Interview Preparation" />} />
-            <Route path="/mentors" element={<ComingSoon title="Find Mentors" />} />
-            <Route path="/network" element={<ComingSoon title="Career Network" />} />
             <Route path="/profile" element={<ComingSoon title="User Profile" />} />
             
             {/* Catch-all route */}
