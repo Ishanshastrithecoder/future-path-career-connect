@@ -86,6 +86,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         email,
         firstName: '',
         lastName: '',
+        profilePicture: 'https://randomuser.me/api/portraits/lego/1.jpg', // Default profile picture
+        occupation: '',
+        education: [], // Initialize as empty array
+        experience: [], // Initialize as empty array
         skills: [],
         interests: [],
         connections: []
@@ -123,6 +127,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         firstName: 'Google',
         lastName: 'User',
         profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
+        occupation: 'Professional',
+        education: [],
+        experience: [],
         skills: [],
         interests: [],
         connections: []
@@ -149,6 +156,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         firstName: 'Apple',
         lastName: 'User',
         profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg',
+        occupation: 'Professional',
+        education: [],
+        experience: [],
         skills: [],
         interests: [],
         connections: []
