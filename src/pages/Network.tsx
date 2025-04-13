@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,8 +10,8 @@ import { Search, Users, UserPlus, MessageCircle, Bell, Briefcase, BookOpen, MapP
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
+import NetworkCommentForm from '@/components/NetworkCommentForm';
 
-// Mock data for connections
 const connections = [
   {
     id: 1,
@@ -49,7 +48,6 @@ const connections = [
   }
 ];
 
-// Mock data for suggested connections
 const suggestedConnections = [
   {
     id: 4,
@@ -86,7 +84,6 @@ const suggestedConnections = [
   }
 ];
 
-// Mock data for posts
 const initialPosts = [
   {
     id: 1,
@@ -99,7 +96,29 @@ const initialPosts = [
     content: "Excited to share that my article on career transitions to tech has been published! Check it out and let me know your thoughts.",
     timestamp: "2 hours ago",
     likes: 42,
-    comments: 8,
+    comments: [
+      {
+        id: 1,
+        author: {
+          name: "James Wilson",
+          title: "Project Manager",
+          profilePicture: "https://randomuser.me/api/portraits/men/32.jpg"
+        },
+        text: "Great article, Lisa! Your insights on transitioning from non-tech backgrounds are especially valuable.",
+        timestamp: "1 hour ago"
+      },
+      {
+        id: 2,
+        author: {
+          name: "Sarah Miller",
+          title: "UX Designer",
+          profilePicture: "https://randomuser.me/api/portraits/women/44.jpg"
+        },
+        text: "Thanks for sharing! I've been considering a career switch myself, and this gives me hope.",
+        timestamp: "45 minutes ago"
+      }
+    ],
+    commentsExpanded: false,
     liked: false,
     image: null,
     tags: ["Career Development", "Tech Industry"]
@@ -115,7 +134,19 @@ const initialPosts = [
     content: "Just completed my certification in Advanced Project Management. Always learning, always growing!",
     timestamp: "5 hours ago",
     likes: 87,
-    comments: 12,
+    comments: [
+      {
+        id: 1,
+        author: {
+          name: "Emma Johnson",
+          title: "Product Manager",
+          profilePicture: "https://randomuser.me/api/portraits/women/32.jpg"
+        },
+        text: "Congratulations! Which certification did you go for?",
+        timestamp: "4 hours ago"
+      }
+    ],
+    commentsExpanded: false,
     liked: false,
     image: null,
     tags: ["Project Management", "Professional Development"]
@@ -131,14 +162,14 @@ const initialPosts = [
     content: "We're hiring! Looking for talented software engineers to join our growing team. Remote positions available.",
     timestamp: "1 day ago",
     likes: 124,
-    comments: 32,
+    comments: [],
+    commentsExpanded: false,
     liked: true,
     image: null,
     tags: ["Job Opportunity", "Remote Work", "Software Engineering"]
   }
 ];
 
-// Mock career insights data
 const careerInsights = [
   {
     id: 1,
@@ -172,6 +203,7 @@ const Network = () => {
   const { user } = useAuth();
   const [postTags, setPostTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [showComments, setShowComments] = useState<Record<number, boolean>>({});
 
   const handleCreatePost = () => {
     if (!postContent.trim()) return;
@@ -187,7 +219,8 @@ const Network = () => {
       content: postContent,
       timestamp: "Just now",
       likes: 0,
-      comments: 0,
+      comments: [],
+      commentsExpanded: false,
       liked: false,
       image: null,
       tags: postTags
@@ -234,6 +267,42 @@ const Network = () => {
     setPostTags(postTags.filter(tag => tag !== tagToRemove));
   };
 
+  const toggleComments = (postId: number) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          commentsExpanded: !post.commentsExpanded
+        };
+      }
+      return post;
+    }));
+  };
+
+  const handleAddComment = (postId: number, commentText: string) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        const newComment = {
+          id: Date.now(),
+          author: {
+            name: user ? `${user.firstName} ${user.lastName}` : "Anonymous User",
+            title: user?.occupation || "Professional",
+            profilePicture: user?.profilePicture || "https://randomuser.me/api/portraits/lego/1.jpg"
+          },
+          text: commentText,
+          timestamp: "Just now"
+        };
+        
+        return {
+          ...post,
+          comments: [...post.comments, newComment],
+          commentsExpanded: true
+        };
+      }
+      return post;
+    }));
+  };
+
   const filteredConnections = connections.filter(conn => 
     conn.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     conn.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -255,7 +324,6 @@ const Network = () => {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left sidebar - Profile summary */}
           <div className="lg:col-span-1">
             <Card className="mb-6">
               <div className="bg-gradient-to-r from-careerblue-600 to-careerblue-800 h-24 rounded-t-lg"></div>
@@ -322,17 +390,33 @@ const Network = () => {
                   <Badge>5</Badge>
                 </div>
                 
-                <Link to="/career-insights" className="block mt-6">
-                  <Button size="responsive" variant="career" className="w-full">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Explore Career Insights
-                  </Button>
-                </Link>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Briefcase className="h-5 w-5 text-gray-600 mr-2" />
+                    <span>Job Matches</span>
+                  </div>
+                  <Badge>12</Badge>
+                </div>
+                
+                <div className="pt-4 space-y-2">
+                  <Link to="/career-insights" className="block">
+                    <Button size="responsive" variant="career" className="w-full">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Career Insights
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/career-explorer" className="block">
+                    <Button size="responsive" variant="outline" className="w-full">
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Explore Jobs
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main content area */}
           <div className="lg:col-span-3">
             <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="grid grid-cols-4 w-full">
@@ -342,9 +426,7 @@ const Network = () => {
                 <TabsTrigger value="insights">Insights</TabsTrigger>
               </TabsList>
               
-              {/* Feed tab */}
               <TabsContent value="feed" className="space-y-6">
-                {/* Create post card */}
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-3">
@@ -413,7 +495,6 @@ const Network = () => {
                   </CardContent>
                 </Card>
 
-                {/* Posts */}
                 {posts.map((post) => (
                   <Card key={post.id}>
                     <CardContent className="p-4">
@@ -468,21 +549,60 @@ const Network = () => {
                           <ThumbsUp className={`h-4 w-4 mr-1 ${post.liked ? "fill-careerblue-800" : ""}`} />
                           {post.likes}
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => toggleComments(post.id)}
+                        >
                           <MessageSquare className="h-4 w-4 mr-1" />
-                          {post.comments}
+                          {post.comments.length}
                         </Button>
                         <Button variant="ghost" size="sm">
                           <Share2 className="h-4 w-4 mr-1" />
                           Share
                         </Button>
                       </div>
+
+                      {post.commentsExpanded && (
+                        <div className="mt-4 pt-3 border-t">
+                          {post.comments.length > 0 ? (
+                            <div className="space-y-3 mb-3">
+                              {post.comments.map((comment) => (
+                                <div key={comment.id} className="flex items-start gap-2">
+                                  <Avatar className="h-6 w-6">
+                                    <AvatarImage src={comment.author.profilePicture} />
+                                    <AvatarFallback>{comment.author.name[0]}</AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex-1 bg-gray-50 rounded-lg p-2">
+                                    <div className="flex justify-between">
+                                      <div>
+                                        <span className="font-medium text-sm">{comment.author.name}</span>
+                                        {comment.author.title && (
+                                          <span className="text-xs text-gray-500"> • {comment.author.title}</span>
+                                        )}
+                                      </div>
+                                      <span className="text-xs text-gray-500">{comment.timestamp}</span>
+                                    </div>
+                                    <p className="text-sm mt-1">{comment.text}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-gray-500 text-sm mb-3">No comments yet. Be the first to comment!</p>
+                          )}
+                          
+                          <NetworkCommentForm 
+                            postId={post.id} 
+                            onCommentSubmit={handleAddComment}
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
               </TabsContent>
 
-              {/* Connections tab */}
               <TabsContent value="connections" className="space-y-6">
                 <Card>
                   <CardContent className="p-4">
@@ -540,7 +660,6 @@ const Network = () => {
                 </Card>
               </TabsContent>
 
-              {/* Discover tab */}
               <TabsContent value="discover" className="space-y-6">
                 <Card>
                   <CardContent className="p-4">
@@ -606,7 +725,6 @@ const Network = () => {
                 </Card>
               </TabsContent>
               
-              {/* Career Insights tab */}
               <TabsContent value="insights" className="space-y-6">
                 <Card>
                   <CardContent className="p-6">

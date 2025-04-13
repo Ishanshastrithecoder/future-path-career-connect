@@ -18,6 +18,8 @@ import ResumeBuilder from "./pages/ResumeBuilder";
 import Mentors from "./pages/Mentors";
 import Network from "./pages/Network";
 import CareerInsights from "./pages/CareerInsights";
+import CareerExplorer from "./pages/CareerExplorer";
+import CareerPathDetail from "./pages/CareerPathDetail";
 
 const queryClient = new QueryClient();
 
@@ -50,9 +52,11 @@ const App = () => (
             <Route path="/mentors" element={<Mentors />} />
             <Route path="/network" element={<Network />} />
             <Route path="/career-insights" element={<CareerInsights />} />
+            <Route path="/career-explorer" element={<CareerExplorer />} />
+            <Route path="/career-path/:id" element={<CareerPathDetail />} />
 
             {/* Placeholder routes for future implementation */}
-            <Route path="/career-explorer" element={<ComingSoon title="Career Explorer" />} />
+            <Route path="/career-explorer" element={<CareerExplorer />} />
             <Route path="/skill-assessment" element={<ComingSoon title="Skill Assessment" />} />
             <Route path="/interviews" element={<ComingSoon title="Interview Preparation" />} />
             <Route path="/profile" element={<ComingSoon title="User Profile" />} />

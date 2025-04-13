@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from '@/components/ui/use-toast';
 import {
   Search,
   Send,
@@ -23,6 +26,7 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Scroll to the bottom of the chat container when messages update
@@ -68,7 +72,11 @@ const Chatbot = () => {
   };
 
   const clearChat = () => {
-    setMessages([]);
+    setMessages([{ text: "Hello! How can I assist you with your career today?", sender: "bot" }]);
+    toast({
+      title: "Chat cleared",
+      description: "Your conversation has been reset."
+    });
   };
 
   return (
@@ -88,43 +96,42 @@ const Chatbot = () => {
           </div>
 
           <CardContent className="p-4">
-            <div
-              ref={chatContainerRef}
-              className="space-y-3 h-96 overflow-y-auto mb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-            >
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"
-                    }`}
-                >
+            <ScrollArea className="h-96 pr-4">
+              <div className="space-y-3 mb-4">
+                {messages.map((message, index) => (
                   <div
-                    className={`${message.sender === "user"
-                      ? "bg-careerblue-100 text-careerblue-800"
-                      : "bg-gray-100 text-gray-800"
-                      } rounded-xl px-4 py-2 max-w-2xs break-words`}
+                    key={index}
+                    className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    {message.text}
+                    <div
+                      className={`${message.sender === "user"
+                        ? "bg-careerblue-100 text-careerblue-800"
+                        : "bg-gray-100 text-gray-800"
+                        } rounded-xl px-4 py-2 max-w-[80%] break-words`}
+                    >
+                      {message.text}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </ScrollArea>
 
-            <div className="flex items-center space-x-2">
-              <Input
-                type="text"
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
+              <Textarea
                 placeholder="Type your message..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-1 rounded-full"
+                className="flex-1 min-h-[80px] sm:min-h-[50px] resize-none"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
                     sendMessage();
                   }
                 }}
               />
-              <Button variant="career" size="icon" onClick={sendMessage}>
-                <Send className="h-5 w-5" />
+              <Button variant="career" onClick={sendMessage} className="self-end">
+                <Send className="h-5 w-5 mr-2" />
+                Send
               </Button>
             </div>
           </CardContent>
