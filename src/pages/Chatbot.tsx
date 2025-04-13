@@ -1,12 +1,12 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowRight, Send, User, Bot } from 'lucide-react';
+import { ArrowRight, Send, User, Bot, FileText, Target, BarChart } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -26,7 +26,6 @@ const startingQuestions = [
 ];
 
 const generateResponse = (message: string): string => {
-  // This would be replaced with actual AI interaction in a real application
   if (message.toLowerCase().includes('resume')) {
     return "I can help you improve your resume! Here are some tips:\n\n1. Tailor your resume for each job application\n2. Highlight quantifiable achievements\n3. Use action verbs\n4. Keep it concise and well-formatted\n5. Include relevant keywords\n\nWould you like me to review your current resume?";
   }
@@ -89,7 +88,6 @@ const Chatbot = () => {
     setInput('');
     setIsTyping(true);
 
-    // Simulate API delay
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -111,7 +109,6 @@ const Chatbot = () => {
 
   const handleQuickQuestion = (question: string) => {
     setInput(question);
-    // Wait a moment to simulate user typing
     setTimeout(() => {
       handleSend();
     }, 100);
@@ -275,5 +272,4 @@ const Chatbot = () => {
   );
 };
 
-import { Link } from 'react-router-dom';
 export default Chatbot;
