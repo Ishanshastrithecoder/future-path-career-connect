@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -21,11 +20,21 @@ import {
   MapPin, 
   Building, 
   ArrowRight,
-  Filter
+  Filter,
+  PieChart,
+  LineChart,
+  BarChart,
+  DollarSign,
+  BookMarked,
+  Lightbulb,
+  Calendar
 } from 'lucide-react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock data for salary insights
 const salaryInsights = [
   { 
     role: "Software Engineer", 
@@ -57,7 +66,6 @@ const salaryInsights = [
   }
 ];
 
-// Mock data for trending careers
 const trendingCareers = [
   {
     title: "AI Specialist",
@@ -93,7 +101,6 @@ const trendingCareers = [
   }
 ];
 
-// Mock data for industry reports
 const industryReports = [
   {
     industry: "Technology",
@@ -118,7 +125,6 @@ const industryReports = [
   }
 ];
 
-// Mock data for skill demand
 const skillsInDemand = [
   { skill: "Machine Learning", demand: 85, growth: "+15%" },
   { skill: "Cloud Computing", demand: 82, growth: "+12%" },
@@ -132,14 +138,76 @@ const skillsInDemand = [
   { skill: "Full-stack Development", demand: 80, growth: "+11%" }
 ];
 
+const jobMarketForecasts = [
+  {
+    sector: "Technology",
+    growth: "+18%",
+    timeframe: "Next 5 years",
+    topJobs: ["AI Engineer", "Cloud Architect", "Cybersecurity Analyst"],
+    challenges: "Rapid technological changes requiring continuous upskilling"
+  },
+  {
+    sector: "Healthcare",
+    growth: "+15%",
+    timeframe: "Next 5 years",
+    topJobs: ["Nurse Practitioner", "Health Informatics Specialist", "Occupational Therapist"],
+    challenges: "Adapting to telehealth and digital record systems"
+  },
+  {
+    sector: "Green Energy",
+    growth: "+24%",
+    timeframe: "Next 5 years",
+    topJobs: ["Solar Engineer", "Sustainability Manager", "Green Building Designer"],
+    challenges: "Evolving regulations and standards in renewable energy"
+  },
+  {
+    sector: "E-Commerce",
+    growth: "+12%",
+    timeframe: "Next 5 years",
+    topJobs: ["Digital Marketing Specialist", "Supply Chain Analyst", "UX/UI Designer"],
+    challenges: "Keeping pace with rapidly changing consumer behaviors"
+  }
+];
+
+const educationRecommendations = [
+  {
+    field: "Data Science",
+    courses: [
+      { name: "Data Science Specialization", provider: "Coursera", duration: "4 months", cost: "$49/month" },
+      { name: "Machine Learning A-Z", provider: "Udemy", duration: "2 months", cost: "$94.99" },
+      { name: "Applied Data Science with Python", provider: "edX", duration: "3 months", cost: "$297" }
+    ]
+  },
+  {
+    field: "Web Development",
+    courses: [
+      { name: "Full Stack Web Development", provider: "Udacity", duration: "4 months", cost: "$399/month" },
+      { name: "The Complete Web Developer", provider: "Udemy", duration: "3 months", cost: "$89.99" },
+      { name: "Web Development Bootcamp", provider: "Coursera", duration: "6 months", cost: "$39/month" }
+    ]
+  },
+  {
+    field: "Digital Marketing",
+    courses: [
+      { name: "Digital Marketing Nanodegree", provider: "Udacity", duration: "3 months", cost: "$399/month" },
+      { name: "Digital Marketing Specialization", provider: "Coursera", duration: "6 months", cost: "$49/month" },
+      { name: "Complete Digital Marketing Course", provider: "Udemy", duration: "2 months", cost: "$94.99" }
+    ]
+  }
+];
+
 const CareerInsights = () => {
   const [activeTab, setActiveTab] = useState("trends");
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('all');
+  const [salaryRange, setSalaryRange] = useState([50000, 150000]);
+  const [showRemoteOnly, setShowRemoteOnly] = useState(false);
+  const { toast } = useToast();
 
   const industries = ["Technology", "Healthcare", "Finance", "Manufacturing", "Education", "Retail", "Entertainment"];
+  const experienceLevels = ["Entry Level", "Mid-Level", "Senior", "Management", "Executive"];
+  const locations = ["Remote", "United States", "Europe", "Asia", "Australia", "Africa", "South America"];
 
-  // Filter functions for data
   const filteredSalaryInsights = salaryInsights.filter(item => 
     item.role.toLowerCase().includes(searchQuery.toLowerCase()) || 
     item.topSkills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -156,6 +224,20 @@ const CareerInsights = () => {
      item.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const handleSubscribe = () => {
+    toast({
+      title: "Subscription successful!",
+      description: "You'll receive weekly career insights in your inbox.",
+    });
+  };
+
+  const handleSavePreferences = () => {
+    toast({
+      title: "Preferences saved",
+      description: "Your career insights preferences have been updated.",
+    });
+  };
+
   return (
     <div className="container py-8">
       <div className="max-w-6xl mx-auto">
@@ -164,7 +246,7 @@ const CareerInsights = () => {
           Make informed career decisions with data-driven insights and industry trends
         </p>
         
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:gap-4 mb-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -196,8 +278,81 @@ const CareerInsights = () => {
           </div>
         </div>
         
+        <Card className="mb-8">
+          <CardHeader className="pb-2">
+            <CardTitle>Advanced Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="experience-level">Experience Level</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger id="experience-level">
+                    <SelectValue placeholder="Select experience level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    {experienceLevels.map((level) => (
+                      <SelectItem key={level} value={level.toLowerCase().replace(' ', '-')}>
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Select defaultValue="all">
+                  <SelectTrigger id="location">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {locations.map((location) => (
+                      <SelectItem key={location} value={location.toLowerCase().replace(' ', '-')}>
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Salary Range: ${salaryRange[0].toLocaleString()} - ${salaryRange[1].toLocaleString()}</Label>
+                <Slider 
+                  defaultValue={salaryRange} 
+                  max={250000} 
+                  min={0} 
+                  step={10000}
+                  onValueChange={setSalaryRange}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="remote-only" 
+                  checked={showRemoteOnly}
+                  onCheckedChange={setShowRemoteOnly}
+                />
+                <Label htmlFor="remote-only">Remote opportunities only</Label>
+              </div>
+              
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-end">
+                <Button 
+                  size="responsive" 
+                  variant="career"
+                  onClick={handleSavePreferences}
+                >
+                  Apply Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="grid grid-cols-4 w-full">
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="trends" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Market Trends</span>
@@ -218,9 +373,18 @@ const CareerInsights = () => {
               <span className="hidden sm:inline">Industry Reports</span>
               <span className="sm:hidden">Reports</span>
             </TabsTrigger>
+            <TabsTrigger value="forecasts" className="flex items-center gap-2">
+              <LineChart className="h-4 w-4" />
+              <span className="hidden sm:inline">Job Forecasts</span>
+              <span className="sm:hidden">Forecasts</span>
+            </TabsTrigger>
+            <TabsTrigger value="education" className="flex items-center gap-2">
+              <BookMarked className="h-4 w-4" />
+              <span className="hidden sm:inline">Education</span>
+              <span className="sm:hidden">Education</span>
+            </TabsTrigger>
           </TabsList>
           
-          {/* Market Trends Tab */}
           <TabsContent value="trends">
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold">Fastest Growing Careers</h2>
@@ -294,7 +458,6 @@ const CareerInsights = () => {
             </div>
           </TabsContent>
           
-          {/* Salary Data Tab */}
           <TabsContent value="salary">
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold">Salary Insights</h2>
@@ -359,7 +522,6 @@ const CareerInsights = () => {
             </div>
           </TabsContent>
           
-          {/* Skills Analysis Tab */}
           <TabsContent value="skills">
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold">Skills in Demand</h2>
@@ -416,7 +578,6 @@ const CareerInsights = () => {
             </div>
           </TabsContent>
           
-          {/* Industry Reports Tab */}
           <TabsContent value="reports">
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold">Industry Reports</h2>
@@ -470,7 +631,167 @@ const CareerInsights = () => {
               </div>
             </div>
           </TabsContent>
+          
+          <TabsContent value="forecasts">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold">Job Market Forecasts</h2>
+              <p className="text-gray-600 mb-6">
+                Long-term predictions for industry growth and employment opportunities
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {jobMarketForecasts
+                  .filter(item => 
+                    item.sector.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.topJobs.some(job => job.toLowerCase().includes(searchQuery.toLowerCase()))
+                  )
+                  .map((forecast, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <CardTitle>{forecast.sector}</CardTitle>
+                          <Badge className="bg-green-100 text-green-800">
+                            {forecast.growth}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-4 w-4" />
+                          <span>{forecast.timeframe}</span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <p className="font-medium">Top Emerging Roles</p>
+                          <div className="grid grid-cols-1 gap-2">
+                            {forecast.topJobs.map((job, idx) => (
+                              <div key={idx} className="flex items-center gap-2">
+                                <Briefcase className="h-4 w-4 text-careerblue-600" />
+                                <span>{job}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="pt-2 border-t">
+                          <p className="font-medium mb-2">Key Challenges</p>
+                          <p className="text-sm text-gray-600">{forecast.challenges}</p>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="border-t pt-4">
+                        <Button size="responsive" variant="career" className="w-full">
+                          Get Detailed Forecast
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                }
+                
+                {jobMarketForecasts.filter(item => 
+                  item.sector.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  item.topJobs.some(job => job.toLowerCase().includes(searchQuery.toLowerCase()))
+                ).length === 0 && (
+                  <div className="col-span-2 text-center p-12 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No forecast data matches your search criteria</p>
+                    <Button 
+                      variant="link" 
+                      onClick={() => setSearchQuery('')}
+                    >
+                      Clear search
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="education">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold">Education & Training Resources</h2>
+              <p className="text-gray-600 mb-6">
+                Find recommended courses and certifications to advance your career
+              </p>
+              
+              <div className="space-y-8">
+                {educationRecommendations
+                  .filter(item => 
+                    item.field.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.courses.some(course => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                  )
+                  .map((edu, index) => (
+                    <div key={index} className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="h-5 w-5 text-careerblue-600" />
+                        <h3 className="text-xl font-semibold">{edu.field}</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {edu.courses.map((course, idx) => (
+                          <Card key={idx} className="h-full">
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-lg">{course.name}</CardTitle>
+                              <p className="text-sm text-gray-500">{course.provider}</p>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="flex justify-between">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm">{course.duration}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <DollarSign className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm">{course.cost}</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                            <CardFooter>
+                              <Button size="responsive" variant="career" className="w-full">
+                                View Course
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                }
+                
+                {educationRecommendations.filter(item => 
+                  item.field.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  item.courses.some(course => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                ).length === 0 && (
+                  <div className="text-center p-12 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No education resources match your search criteria</p>
+                    <Button 
+                      variant="link" 
+                      onClick={() => setSearchQuery('')}
+                    >
+                      Clear search
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
+        
+        <Card className="mt-12">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Stay Updated with Career Trends</h3>
+                <p className="text-gray-600">Subscribe to our newsletter for weekly insights on job market trends, in-demand skills, and career development tips.</p>
+              </div>
+              <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+                <Input placeholder="Enter your email address" className="w-full" />
+                <Button size="responsive" variant="career" onClick={handleSubscribe}>
+                  Subscribe
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
